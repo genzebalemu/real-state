@@ -1,18 +1,13 @@
 import mongoose from "mongoose";
 
-const dbConnect = () => { // Renamed the function
+const dbConnect = () => {
   // Connect to MongoDB
-  mongoose.connect('mongodb://localhost:27017/tour', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
-  // Check MongoDB connection
-  const dbConnection = mongoose.connection; // Renamed the variable
-  dbConnection.on('error', console.error.bind(console, 'MongoDB connection error:'));
-  dbConnection.once('open', () => {
+  mongoose.connect(process.env.MONGO).then(() => {
     console.log('Connected to MongoDB');
-  });
+  })
+  .catch((error)=>{
+    console.log(error)
+  })
 };
 
-export default dbConnect; // Updated the export
+export default dbConnect; 

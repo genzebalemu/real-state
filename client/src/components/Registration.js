@@ -1,33 +1,61 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 const Registration = () => {
+
+  const Navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
   });
 
+  const handleChange=(e)=>{
+    setFormData({ ...formData,[e.target.name]:e.target.value})
+  }
+
+  const handleSubmit= async(e)=>{
+    e.preventDefault();
+    try {
+      await axios 
+         .post('http://localhost:4000/signup',formData)
+        
+         .then((response) => {
+            console.log(response.data);
+            console.log('Before Navigation');
+            Navigate('/signin');
+            console.log('After Navigation');
+      })
+    } catch (error) {
+      console.log(error)
+    }}
+
   return (
     <div className="bg-gray-100 w-full h-screen flex items-center justify-center">
       <div className="mx-auto p-8 bg-white rounded-md shadow-md max-w-md w-full">
         <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
-        <form className="flex flex-col space-y-6">
+        <form className="flex flex-col space-y-6" onSubmit={handleSubmit}>
           <input
             type="text"
             name="username"
             placeholder="Username"
+            onChange={handleChange}
             className="border p-3 rounded-lg"
           />
           <input
             type="email"
             name="email"
             placeholder="Email"
+            onChange={handleChange}
             className="border p-3 rounded-lg"
           />
           <input
             type="password"
             name="password"
             placeholder="Password"
+            onChange={handleChange}
             className="border p-3 rounded-lg"
           />
 
