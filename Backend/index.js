@@ -1,6 +1,7 @@
 import  express  from "express";
 import cors from "cors"
-import realstateRouter from "./Routes/Authroute.js"
+import AuthRouter from "./Routes/AuthRoute.js"
+// import UserRouter from "./Routes/UserRoute.js"
 import bodyParser from "body-parser";
 import dbConnect from "./Databases/database.js"
 import dotenv from 'dotenv'
@@ -13,7 +14,8 @@ app.use(bodyParser.json())
 
 
 dbConnect()
-app.use("/", realstateRouter);
+app.use("/",AuthRouter);
+// app.use("/user",UserRouter)
 // app.use((error,req,res,next)=>{
 //     const statusCode=error.statusCode || 500;
 //     const message= error.message || 'internal server error'

@@ -5,12 +5,12 @@ import { BrowserRouter as Router, Routes,Route  } from 'react-router-dom';
 import Registration from "./components/Registration";
 import UpdateProfile from "./components/UpdateProfile";
 import About from "./components/About";
-import Navbar from "./components/Navbar";
+import Header from "./components/Header";
 import Detailpage from "./components/Detailpage";
 function App() {
   return (
     <Router>
-      <Navbar />
+      <Header />
         <Routes>
           <Route path="/" element={<Home />}/>
           <Route path="/signin"  element={<Login />}/>

@@ -1,50 +1,47 @@
 import React, { useState } from 'react';
-import { FaEye,FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios"
+import { useSelector, useDispatch } from 'react-redux';
+import { RingLoader } from 'react-spinners';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
-const Registration = () => {
-  const Navigate = useNavigate()
-// visiblity of the password
-  const [showPassword,setShowPassword]=useState(false)
-  const togglePassword=()=>setShowPassword(!showPassword)
+import { loginStart, loginSuccess, loginFailure } from '../redux/Slice/UserSlice';
+
+const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isLoading = useSelector((state) => state.user.isLoading);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePassword = () => setShowPassword(!showPassword);
 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const handleChange=(e)=>{
-    setFormData({...formData,[e.target.name]:e.target.value})
-  }
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(loginStart());
+
     try {
       const response = await axios.post('http://localhost:4000/login', formData);
-      
-      // Assuming the response contains a 'Token'
-      const token = response.data.token;
-      console.log(response.data, token);
-      
-      // Check if the response contains a token
-      if (token) {
-        // Save the token to localStorage or a state management solution
-        // For example, 
-        localStorage.setItem('token', token);
-  
-        // Redirect to the home page
-        Navigate('/');
-        console.log(localStorage)
+
+      if (response.data.token) {
+        dispatch(loginSuccess(response.data.user));
+        navigate('/');
       } else {
-        // Handle the case where the token is not present in the response
-        console.error('Token not found in the response');
+        dispatch(loginFailure('Login failure'));
       }
     } catch (error) {
-      console.log(error);
-      // Handle errors, such as network issues or server errors
+      dispatch(loginFailure('Internal server error'));
     }
   };
-  
+
   return (
     <div className="bg-gray-100 w-full h-screen flex items-center justify-center">
       <div className=" p-8 bg-white rounded-md shadow-md max-w-md w-full">
@@ -58,33 +55,41 @@ const Registration = () => {
             className="border p-3 rounded-lg"
           />
 
-          <div className='relative' >
-          <input
-            type={showPassword ? "text"  : "password"}
-            name="password"
-            placeholder="Password"
-            onChange={handleChange}
-            className="border p-3 rounded-lg  w-full"
-          />
-          <span onClick={togglePassword} className="absolute top-1/2 right-3  -translate-y-1/2 text-gray-500">
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password"
+              onChange={handleChange}
+              className="border p-3 rounded-lg  w-full"
+            />
+            <span
+              onClick={togglePassword}
+              className="absolute top-1/2 right-3  -translate-y-1/2 text-gray-500"
+            >
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
           </div>
-          
-          <button className="bg-blue-500 h-10 rounded-xl text-lg text-white font-bold">
-            Sign In
+
+          <button 
+          disabled={isLoading}
+          className="bg-blue-500 h-10 rounded-xl text-lg text-white font-bold hover:opacity-95 disabled:opacity-80">
+            {isLoading ? 'Loading...' : 'Sign In '}
           </button>
+
           <button className="bg-blue-500 h-10 rounded-xl text-lg text-white font-bold bg-red-700">
-            Signin with Google
+            Sign in with Google
           </button>
         </form>
-        <div className='flex  space-x-2 py-4'>
-          <p>Haven,t an account?</p>
-          <Link to={'/signup'} className='text-blue-700 underline '>sign Up</Link>
+        <div className="flex  space-x-2 py-4">
+          <p>Haven't an account?</p>
+          <Link to={'/signup'} className="text-blue-700 underline ">
+            Sign Up
+          </Link>
         </div>
       </div>
     </div>
   );
 };
 
-export default Registration;
+export default Login;

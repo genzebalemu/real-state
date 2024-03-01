@@ -1,12 +1,12 @@
-import express from "express";
-const router=express.Router()
-import { name } from "../Controllers/User";
+// import express from "express";
+// const router=express.Router()
+// import { name } from "../Controllers/UserController";
 
-router.post()
-router.get('/',name)
+// router.post()
+// router.get('/',name)
 
-router.delete()
+// router.delete('/')
 
-router.put()
+// router.put('/')
 
-export default router;
+// export default router;

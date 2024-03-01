@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { FaEye,FaEyeSlash } from 'react-icons/fa';
 import axios from 'axios';
+import { useDispatch,useSelector } from 'react-redux';
+import { signUpStart,signUpSuccess,signUpFailure } from '../redux/Slice/UserSlice';
 const Registration = () => {
+  const dispatch = useDispatch();
+  const navigate=useNavigate();
+  const [showPassword,setShowPassword]=useState(false);
+  const togglePassword=()=>setShowPassword(!showPassword);
 
-  const Navigate = useNavigate();
-  
+  const isLoading = useSelector((state)=>state.user.isLoading)
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -16,22 +22,30 @@ const Registration = () => {
     setFormData({ ...formData,[e.target.name]:e.target.value})
   }
 
-  const handleSubmit= async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(signUpStart());
+    
     try {
-      await axios 
-         .post('http://localhost:4000/signup',formData)
-        
-         .then((response) => {
-            console.log(response.data);
-            console.log('Before Navigation');
-            Navigate('/signin');
-            console.log('After Navigation');
-      })
+      const response = await axios.post('http://localhost:4000/signup', formData);
+      console.log('Server Response:', response); // Add this log statement
+      if (response.data.newUser) {
+        dispatch(signUpSuccess(response.data.newUser));
+        navigate('/signin')
+      } else {
+        dispatch(signUpFailure("Registration failed"));
+      }
     } catch (error) {
-      console.log(error)
-    }}
-
+      // console.error("Signup Error:", error.response?.data || error.message);
+      if (error.response?.status === 400 && error.response?.data === "Email is already in use") {
+        dispatch(signUpFailure("Email is already in use"));
+      } else {
+        dispatch(signUpFailure("Internal server error"));
+      }
+    }
+    
+  };
+  
   return (
     <div className="bg-gray-100 w-full h-screen flex items-center justify-center">
       <div className="mx-auto p-8 bg-white rounded-md shadow-md max-w-md w-full">
@@ -51,16 +65,23 @@ const Registration = () => {
             onChange={handleChange}
             className="border p-3 rounded-lg"
           />
+                   <div className='relative' >
           <input
-            type="password"
+            type={showPassword ? "text"  : "password"}
             name="password"
             placeholder="Password"
             onChange={handleChange}
-            className="border p-3 rounded-lg"
+            className="border p-3 rounded-lg  w-full"
           />
+          <span onClick={togglePassword} className="absolute top-1/2 right-3  -translate-y-1/2 text-gray-500">
+            {showPassword ? <FaEye /> : <FaEyeSlash /> }
+          </span>
+          </div>
 
-          <button className="bg-blue-500 h-10 rounded-xl text-lg text-white font-bold">
-            Sign Up
+          <button 
+          disabled={isLoading}
+          className="bg-blue-500 h-10 rounded-xl text-lg text-white font-bold">
+           { isLoading ? 'Loading...':"sign Up"}
           </button>
           <button className="bg-blue-500 h-10 rounded-xl text-lg text-white font-bold bg-red-700">
             SignUp with Google
@@ -73,6 +94,6 @@ const Registration = () => {
       </div>
     </div>
   );
-};
+  }
 
 export default Registration;

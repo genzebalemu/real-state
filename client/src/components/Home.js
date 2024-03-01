@@ -1,5 +1,5 @@
 import React from 'react'
-import Navbar from './Navbar'
+import Navbar from './Header'
 import ImageSlider from './Imageslider'
 import { Link } from 'react-router-dom'
 const Home = () => {
